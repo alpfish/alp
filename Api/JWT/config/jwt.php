@@ -8,7 +8,7 @@ return [
     // 算法，只支持'HS256', 'HS384', 'HS512' and 'RS256'
     'alg' => 'HS512',
 
-    'touch' => 60, // token刷新频率(即请求TOKEN的'iat'超过多少秒后自动刷新并返回刷新后的TOKEN)
+    'touch' => 60*60, // token刷新频率(即请求TOKEN的'iat'超过多少秒后自动刷新并返回刷新后的TOKEN)
 
     // 配置Body部分的数据数组：权利断言/申明，（生成JWT时叫$claims，客户端传回来验证叫$payload）
     'claims' => [

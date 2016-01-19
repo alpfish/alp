@@ -3,8 +3,11 @@ namespace Alp\Api\JWT\Contracts;
 
 interface JWT
 {
+    // 单例模式
+    public static function getInstance();
+
     /* *
-     * JWT初始化
+     * JWT初始化(包括认证和自动刷新TOKEN)
      *
      * 在ApiServiceProvider的boot()中引导
      *
@@ -13,7 +16,9 @@ interface JWT
     public static function init();
 
     /* *
-     * 与Laravel Auth对接
+     * 与Laravel Auth进行一次性认证连接
+     *
+     * 使得JWT和整个应用都能共享请求token中的认证
      *
      * @return boolean
      * */

@@ -2,7 +2,7 @@
 namespace Alp\Api;
 
 use Alp\Api\Data\Data;
-use Alp\Api\JWT\JWTProvider;
+use Alp\Api\JWT\JWT;
 use Illuminate\Support\ServiceProvider;
 
 class ApiServiceProvider extends ServiceProvider
@@ -16,31 +16,30 @@ class ApiServiceProvider extends ServiceProvider
     protected $defer = false;
 
     /**
-     * 引导逻辑
-     *
      * @return void
      */
     public function boot()
     {
+        // 合并JWT配置文件
         $this->mergeConfig();
-        JWTProvider::init();
+        // JWT初始化
+        JWT::init();
     }
 
     /**
-     * 注册所有
-     *
      * @return void
      */
     public function register()
     {
-        $this->JWTRegister();
-        $this->DataRegister();
+        //已在帮助函数jwt()和data()中单例绑定JWT和Data，所以这里注释掉相关注册
+        //$this->JWTRegister();
+        //$this->DataRegister();
     }
 
     /* *
      * 合并JWT配置文件
      *
-     * @return void 可以使用config('jwt')帮助函数
+     * @return void
      */
     protected function mergeConfig()
     {
@@ -51,27 +50,21 @@ class ApiServiceProvider extends ServiceProvider
     }
 
     /**
-     * Api Data数据封装与基本响应 注册
+     * 注册 Api Data
      */
-    public function DataRegister()
+    protected function DataRegister()
     {
-        $this->app->singleton('data', function(){
-            return new Data;
-        });
+        // 绑定实例(Data中已为单例模式)
+        $this->app->instance('jwt', Data::getInstance());
     }
 
     /* *
-     * Api JWT注册
+     * 注册 Api JWT
      * */
-    public function JWTRegister()
+    protected function JWTRegister()
     {
-        // 别名
-        $this->app->alias('jwt', 'Alp\Api\JWT\Contracts\JWT');
-
-        // 单例
-        $this->app->singleton('jwt', function(){
-            return new JWTProvider;
-        });
+        // 绑定实例(JWT中已为单例模式)
+        $this->app->instance('jwt', JWT::getInstance());
     }
 
 }

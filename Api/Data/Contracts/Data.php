@@ -37,30 +37,81 @@ namespace Alp\Api\Data\Contracts;
 
 interface Data
 {
-    // 装填用户响应数据(如果$key存在，则会覆盖, 支持参数为单键值对或数组)
+    /* *
+     * @return self
+     * 在帮助函数中实现：return \Alp\Api\Data\Data::getInstance();
+     * */
+    public static function getInstance();
+
+    /* *
+    * 装填用户响应数据(支持参数为数组或键值对)
+    *
+    * @param  string $key
+    * @param  mixed  $value
+    * @return $this
+    * */
     public function set($key, $value=null);
 
-    // 装填用户响应错误数据(支持参数为单键值对或数组)
+    /* *
+     * 装填用户响应错误数据(支持参数为数组或键值对)
+     *
+     * @param  string $key
+     * @param  mixed  $value
+     * @return $this
+     * */
     public function setErr($key, $value=null);
 
-    // 设响应头
+    /* *
+     * 设响应头
+     *
+     * @param  string $key
+     * @param  string $value
+     * @return $this
+     * */
     public function header($key, $value);
 
-    // 设状态码
+    /* *
+     * 设状态码
+     *
+     * @param  int $status
+     * @return $this
+     * */
     public function status($status);
 
-    // 发送响应
-    public function send($content=[], $status=200, $header=[], $format='JSON');
+    /* *
+     * 发送响应
+     *
+     * @param  array $content
+     * @param  int|string $status
+     * @param  array $header
+     * @param  string $format
+     * @return Response
+     * */
+    public function send($content=null, $status=null, $header=null, $format='JSON');
 
-    // 用户信息错误响应(支持参数为数组或单键值对)
-    public function sendErr($key, $value=null);
+    /* *
+     * 用户错误信息响应
+     *
+     * 支持参数为数组或键值对
+     * */
+    public function sendErr($key, $value=null, $status=400);
 
-    // 前端错误方法响应
+    /* *
+     * 前端错误方法响应
+     * */
     public function sendBadMethod();
 
-    // 前端错误参数响应
+    /* *
+     * 前端错误参数响应
+     * */
     public function sendBadParam($message);
 
-    // get() 获取数据
+    /* *
+     * 获取数据
+     *
+     * 不带参数获取响应数据，带参数获取对应$key的$value
+     * @param  string $key
+     * @return mixed
+     * */
     public function get($key = null);
 }

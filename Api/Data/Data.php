@@ -51,7 +51,16 @@ class Data implements DataContract
     // 响应头
     protected $header;
 
-    public function __construct() {
+    // 返回单例
+    protected static $self;
+
+    /* *
+     * 单例模式
+     *
+     * 便于IDE工具中使用帮助函数data()时提示相关方法
+     * 如帮助函数中已返回实例，则无需在ApiServiceProvider中再注册实例到app容器
+     * */
+    private function __construct() {
         
         // 初始化data集合
         $this->data = collect([]);
@@ -61,6 +70,17 @@ class Data implements DataContract
         
         // 封装响应数据
         $this->responseData = collect(['data' => $this->data]);
+    }
+
+    /* *
+     * @return self
+     * 在帮助函数中实现：return \Alp\Api\Data\Data::getInstance();
+     * */
+    public static function getInstance() {
+        if (self::$self)
+            return self::$self;
+        else
+            return self::$self = new self();
     }
 
     /* *
@@ -118,16 +138,16 @@ class Data implements DataContract
     /* *
      * 装填"没有权限"数据
      * */
-    public function setNotHasPower() {
+    /*public function setNotHasPower() {
         // TODO
-    }
+    }*/
 
     /* *
      * 装填"没有记录"数据
      * */
-    public function setNotFoundRecord() {
+    /*public function setNotFoundRecord() {
         // TODO
-    }
+    }*/
 
     /* *
      * 设响应头
@@ -198,10 +218,13 @@ class Data implements DataContract
      *
      * 支持参数为数组或键值对
      * */
-    public function sendErr($key, $value=null) {
-
-        $this->setErr($key, $value);
-
+    public function sendErr($key, $value=null, $status=400) {
+        //设置错误数据
+        $err = is_array($key) ? $key : [$key => $value];
+        $this->setErr($err);
+        //设置状态码
+        $status = is_array($key) && is_int($value) && strlen($value) === 3 && $status === 400 ? $value : $status;
+        $this->status($status);
         return $this->send();
     }
 
@@ -238,9 +261,9 @@ class Data implements DataContract
     /* *
      * 前端请求头错误响应
      * */
-    public function sendBadHeader() {
+    /*public function sendBadHeader() {
         // TODO
-    }
+    }*/
 
     /* *
      * 获取数据
