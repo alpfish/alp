@@ -120,12 +120,16 @@ class Data implements DataContract
         isset($this->data['errors']) ?: $this->data['errors'] = collect([]);
         // 数组
         if (is_array($key)) {
-            foreach ($key as $k=>$v)
+            foreach ($key as $k=>$v) {
+                $v = is_array($v) ? $v[0] : $v; // 转换所有错误值为字符串
                 $this->data['errors']->put(trim($k), $v);
+            }
+
             return $this;
         }
         // 键值对
         if (! is_object($key)) {
+            $value = is_array($value) ? $value[0] : $value; // 转换所有错误值为字符串
             $this->data['errors']->put(trim($key), $value);
             return $this;
         }
@@ -187,30 +191,22 @@ class Data implements DataContract
      * @param  string $format
      * @return Response
      * */
-    public function send($content=null, $status=null, $header=null, $format='JSON') {
+    public function send($key=null, $value=null) {
+
         // 追加数据
-        if (isset($content))
-            $this->set($content);
-
-        // 状态码
-        is_int($status) && strlen($status)==3 ?: $status = $this->status;
-
-        // 响应头
-        if (isset($header) && is_array($header)) {
-            foreach ($header as $key => $value)
-                $this->header($key, $value);
-        }
+        if (isset($key))
+            $this->set($key, $value);
 
         // XML响应
-        empty(request('format')) ?: $format=request('format');
+        $format = empty(request('format')) ? 'JSON' : $format=request('format');
         if (strtoupper($format) == 'XML') {
             $content = $this->xmlEncode($this->responseData->toArray());
             $this->header('Content-Type', 'text/xml');
-            return response($content, $status, $this->header->toArray());
+            return response($content, $this->status, $this->header->toArray());
         }
 
         // JSON响应
-        return response()->json($this->responseData->toArray(), $status, $this->header->toArray());
+        return response()->json($this->responseData->toArray(), $this->status, $this->header->toArray());
     }
 
     /* *
@@ -233,11 +229,11 @@ class Data implements DataContract
      * */
     public function sendBadMethod() {
         $this->status = 405;
-        $this->responseData = collect([
+        $this->other([
             'status ' => $this->status,
             'error  ' => 'METHOD_NOT_ALLOWED',
             'message' => '请求的API方法不存在：method='.request('method'),
-            'helpDoc' => request()->url(),
+            'helpDoc' => request()->url() . '?help=null',
         ]);
 
         return $this->send();
@@ -248,7 +244,7 @@ class Data implements DataContract
      * */
     public function sendBadParam($message) {
         $this->status = 400;
-        $this->responseData = collect([
+        $this->other([
             'status ' => $this->status,
             'error  ' => 'HTTP_BAD_REQUEST',
             'message' => "请求的API参数错误:{$message}",
@@ -280,6 +276,35 @@ class Data implements DataContract
             return null;
         }
         return $this->responseData;
+    }
+
+    /* *
+     * 装填Data外的其他响应数据(支持参数为数组或键值对)
+     *
+     * @param  string $key
+     * @param  mixed  $value
+     * @return $this
+     * */
+    private function other($key, $value=null) {
+        // 数组
+        if (is_array($key)) {
+            foreach ($key as $k=>$v)
+                $this->responseData->put($k, $v);
+            return $this;
+        }
+        // 键值对
+        if (! is_object($key)) {
+            if (is_null($value)) {
+                $this->responseData->push($key);
+                return $this;
+            }
+            $this->responseData->put($key, $value);
+            return $this;
+        }
+        // 对象
+        $this->responseData->put('Object Key to Value '.mt_rand(0,99), $key);
+
+        return $this;
     }
 
     /* *

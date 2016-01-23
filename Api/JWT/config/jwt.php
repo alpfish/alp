@@ -6,7 +6,7 @@ return [
     'key' => 'ajDFskfdlASDFjzhxiFGvDSmwrnbasASdiofcjdFGHsafknjlsaf',
 
     // 算法，只支持'HS256', 'HS384', 'HS512' and 'RS256'
-    'alg' => 'HS512',
+    'alg' => 'HS256',
 
     'touch' => 60*60, // token刷新频率(即请求TOKEN的'iat'超过多少秒后自动刷新并返回刷新后的TOKEN)
 
@@ -16,7 +16,7 @@ return [
         'aud' => '',    //  接受人Audience（一般为用户ID，或自定义uid，这里不用设置）
         'iat' => '',  // 发行时间，不用设置
         'exp' => 7*24*60*60,  // 过期时间，默认7天
-        'sub' => 'LerHoo',    // 标题
+        'sub' => '',    // 标题
         'nbf' => '',  // 不能在此时间之前使用
         'jti' => '',    // JWT ID
     ],

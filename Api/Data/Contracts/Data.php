@@ -87,7 +87,7 @@ interface Data
      * @param  string $format
      * @return Response
      * */
-    public function send($content=null, $status=null, $header=null, $format='JSON');
+    public function send($key=null, $value=null);
 
     /* *
      * 用户错误信息响应
