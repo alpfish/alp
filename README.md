@@ -1,3 +1,7 @@
+# 介绍
+一个学习Laravel 5.1 的库，包括Api/JWT SNS Email 认证等
+
+
 引入 Laravel Application 方法：
 
 1. 在/composer.json 加入:
